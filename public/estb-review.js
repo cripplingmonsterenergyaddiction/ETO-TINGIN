@@ -35,19 +35,6 @@
 const showPopup = document.querySelector('.post-popup');
 const popupContainer = document.querySelector('.post-popup-container');
 const closePopup = document.querySelector('.post-popup-close-button');
-const editPopup = document.querySelector('.edit-button')
-const editPopupContainer = document.querySelector('.edit-popup-container');
-const editClosePopup = document.querySelector('.edit-popup-close-button');
-const editSavePopup = document.querySelector('.save-post-popup-edit');
-const deletePopup = document.querySelector('.del-button')
-const deletePopupContainer = document.querySelector('.delete-popup-container');
-const deleteClosePopup = document.querySelector('.confirm-del-button'); 
-const deleteCancelPopup = document.querySelector('.cancel-del-button');
-const ownerReplyPopup = document.querySelector('.owner-reply-button');
-const ownerPopupContainer = document.querySelector('.owner-reply-container');
-const ownerClosePopup = document.querySelector('.owner-popup-close-button');
-const ownerSavePopup = document.querySelector('.owner-save-post-popup');
-
 
 showPopup.addEventListener('click', () => {
 	popupContainer.showModal();
@@ -57,143 +44,427 @@ closePopup.addEventListener('click', () => {
 	popupContainer.close();
 })
 
-editPopup.addEventListener('click', () => {
-	editPopupContainer.showModal();
-})
-
-editClosePopup.addEventListener('click', () => {
-	editPopupContainer.close();
-})
-
-editSavePopup.addEventListener('click', () => {
-	editPopupContainer.close();
-})
-
-deletePopup.addEventListener('click', () => {
-	deletePopupContainer.showModal();
-})
-
-deleteClosePopup.addEventListener('click', () => {
-	deletePopupContainer.close();
-})
-
-deleteCancelPopup.addEventListener('click', () => {
-	deletePopupContainer.close();
-})
-
-ownerReplyPopup.addEventListener('click', () => {
-	ownerPopupContainer.showModal();
-})
-
-ownerClosePopup.addEventListener('click', () => {
-	ownerPopupContainer.close();
-})
-
-ownerSavePopup.addEventListener('click', () => {
-	ownerPopupContainer.close();
-})
 
 
-const editPopup2 = document.querySelector('.edit-button-2')
-const editPopupContainer2 = document.querySelector('.edit-popup-container-2');
-const editClosePopup2 = document.querySelector('.edit-popup-close-button-2');
-const editSavePopup2 = document.querySelector('.edit-save-button-2');
-const deletePopup2 = document.querySelector('.del-button-2')
-const deletePopupContainer2 = document.querySelector('.delete-popup-container-2');
-const deleteClosePopup2 = document.querySelector('.confirm-del-button-2'); 
-const deleteCancelPopup2 = document.querySelector('.cancel-del-button-2'); 
+function addModalHandlers(buttonClass, modalClass, closeClass, saveClass) {
+    const buttons = document.querySelectorAll(buttonClass);
+    const modals = document.querySelectorAll(modalClass);
+    const closeButtons = document.querySelectorAll(closeClass);
+    const saveButtons = document.querySelectorAll(saveClass);
 
-editPopup2.addEventListener('click', () => {
-	editPopupContainer2.showModal();
-})
+    buttons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            modals[index].showModal();
+        });
+    });
 
-editClosePopup2.addEventListener('click', () => {
-	editPopupContainer2.close();
-})
+    closeButtons.forEach((closeButton, index) => {
+        closeButton.addEventListener('click', () => {
+            modals[index].close();
+        });
+    });
 
-editSavePopup2.addEventListener('click', () => {
-	editPopupContainer2.close();
-})
+    if (saveClass) {
+        saveButtons.forEach((saveButton, index) => {
+            saveButton.addEventListener('click', () => {
+                modals[index].close();
+            });
+        });
+    }
+}
 
-deletePopup2.addEventListener('click', () => {
-	deletePopupContainer2.showModal();
-})
-
-deleteClosePopup2.addEventListener('click', () => {
-	deletePopupContainer2.close();
-})
-
-deleteCancelPopup2.addEventListener('click', () => {
-	deletePopupContainer2.close();
-})
+// For the first set of modals
+addModalHandlers('.edit-button', '.edit-popup-container', '.edit-popup-close-button', '.save-post-popup-edit');
+addModalHandlers('.del-button', '.delete-popup-container', '.confirm-del-button', '.cancel-del-button');
+addModalHandlers('.owner-reply-button', '.owner-reply-container', '.owner-popup-close-button', '.owner-save-post-popup');
 
 
- // Select all elements with the "i" tag and store them in a NodeList called "stars"
- const stars = document.querySelectorAll(".stars i");
+ // Object to store the latest ratings for each type
+let latestRatings = {};
 
- const overallStar = document.querySelectorAll(".stars #overall");
- const serviceStar = document.querySelectorAll(".stars #service");
- const foodStar = document.querySelectorAll(".stars #food");
- const ambianceStar = document.querySelectorAll(".stars #ambiance");
-//  // Loop through the "stars" NodeList
-//  stars.forEach((star, index1) => {
-//    // Add an event listener that runs a function when the "click" event is triggered
-//    star.addEventListener("click", () => {
-// 	 // Loop through the "stars" NodeList Again
-// 	 stars.forEach((star, index2) => {
-// 	   // Add the "active" class to the clicked star and any stars with a lower index
-// 	   // and remove the "active" class from any stars with a higher index
-// 	   index1 >= index2 ? star.classList.add("active") : star.classList.remove("active");
-// 	 });
-//    });
-//  });
+// Function to send data to the server
+function sendDataToServer(formData) {
+    // Example URL where you want to send the data
+    const url = '/update-comment';
 
-  // Loop through the "stars" NodeList
-  overallStar.forEach((star, index1) => {
-	// Add an event listener that runs a function when the "click" event is triggered
-	star.addEventListener("click", () => {
-	  // Loop through the "stars" NodeList Again
-	  overallStar.forEach((star, index2) => {
-		// Add the "active" class to the clicked star and any stars with a lower index
-		// and remove the "active" class from any stars with a higher index
-		index1 >= index2 ? star.classList.add("active") : star.classList.remove("active");
-	  });
-	});
-  });
+    // Fetch API to send data to the server
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        // Handle response from the server if needed
+        console.log('Data sent successfully.');
+    })
+    .catch(error => {
+        // Handle error if the request fails
+        console.error('Error sending data:', error);
+    });
+}
 
-    // Loop through the "stars" NodeList
-	serviceStar.forEach((star, index1) => {
-		// Add an event listener that runs a function when the "click" event is triggered
-		star.addEventListener("click", () => {
-		  // Loop through the "stars" NodeList Again
-		  serviceStar.forEach((star, index2) => {
-			// Add the "active" class to the clicked star and any stars with a lower index
-			// and remove the "active" class from any stars with a higher index
-			index1 >= index2 ? star.classList.add("active") : star.classList.remove("active");
-		  });
-		});
-	  });
+function handleSubmit(event) {
+  event.preventDefault(); // Prevent default form submission
 
-	  foodStar.forEach((star, index1) => {
-		// Add an event listener that runs a function when the "click" event is triggered
-		star.addEventListener("click", () => {
-		  // Loop through the "stars" NodeList Again
-		  foodStar.forEach((star, index2) => {
-			// Add the "active" class to the clicked star and any stars with a lower index
-			// and remove the "active" class from any stars with a higher index
-			index1 >= index2 ? star.classList.add("active") : star.classList.remove("active");
-		  });
-		});
-	  });  
+  const modals = document.querySelectorAll('.edit-popup-container'); // get the number of edits
+  
+  // Get form data
+  const formData = new FormData(event.target);
+  
+  // Construct object with only id, title, and desc
+  const data = {
+      id: formData.get('id'),
+      title: formData.get('title'),
+      desc: formData.get('desc')
+  };
 
-	  ambianceStar.forEach((star, index1) => {
-		// Add an event listener that runs a function when the "click" event is triggered
-		star.addEventListener("click", () => {
-		  // Loop through the "stars" NodeList Again
-		  ambianceStar.forEach((star, index2) => {
-			// Add the "active" class to the clicked star and any stars with a lower index
-			// and remove the "active" class from any stars with a higher index
-			index1 >= index2 ? star.classList.add("active") : star.classList.remove("active");
-		  });
-		});
-	  });
+  // Check if all ratings are provided
+  const requiredRatings = ['food', 'service', 'ambiance', 'overall'];
+  const suffixes = [...Array(modals.length).keys()];
+ 
+  
+  console.log(suffixes);
+  for (const ratingType of requiredRatings) {
+      let ratingProvided = false;
+      for (const suffix of suffixes) {
+          if (latestRatings.hasOwnProperty(`${ratingType}-${suffix}`)) {
+              ratingProvided = true;
+              break;
+          }
+      }
+      if (!ratingProvided) {
+          alert(`Please provide a ${ratingType} rating.`);
+          return; // Prevent further execution
+      }
+  }
+
+  // Merge form data and latest ratings
+  const mergedData = { ...data, ...latestRatings };
+
+  // Send data to the server
+  sendDataToServer(mergedData);
+
+  // Close the modal associated with the form
+
+
+  
+  const form = event.target;
+  const modalId = form.dataset.modalId; // Retrieve the modal ID from the data attribute
+  $("#title-" + modalId).html(data.title);
+  $("#desc-" + modalId).html(data.desc);
+  console.log("desc show pls: ", data.desc)
+  const foodStars = `<img src="images/star.png" alt="" class="stars-1"></img>`.repeat(latestRatings['food-' + modalId])
+  const ambianceStars = `<img src="images/star.png" alt="" class="stars-1"></img>`.repeat(latestRatings['ambiance-' + modalId])
+  const overallStars = `<img src="images/star.png" alt="" class="stars-1"></img>`.repeat(latestRatings['overall-' + modalId])
+  const serviceStars = `<img src="images/star.png" alt="" class="stars-1"></img>`.repeat(latestRatings['service-' + modalId])
+  console.log("food stars", foodStars)
+  $("#food-" + modalId).html(foodStars);
+  $("#ambiance-" + modalId).html(ambianceStars);
+  $("#overall-" + modalId).html(overallStars);
+  $("#service-" + modalId).html(serviceStars);
+  let currDate = new Date().toLocaleDateString();
+  console.log(currDate);
+  $('#date-' + modalId).html(currDate)
+  $('#edited-' + modalId).html("edited")
+
+  
+  console.log("MODAL ID: ", modalId); 
+  modals[modalId].close();
+
+
+
+
+
+ 
+}
+
+
+// Function to handle star click
+function handleStarClick(stars, index, ratingType) {
+    stars.forEach((star, index2) => {
+        index >= index2 ? star.classList.add("active") : star.classList.remove("active");
+    });
+    
+    // Get the rating value (index + 1 because index is 0-based)
+    const ratingValue = index + 1;
+    
+    // Update the latest rating for the corresponding type
+    latestRatings[ratingType] = ratingValue;
+  
+    // Log the latest rating
+    console.log(`Latest ${ratingType} Rating:`, ratingValue);
+}
+
+// Initialize listeners for each set of stars
+document.querySelectorAll('.stars').forEach(starsContainer => {
+    const stars = starsContainer.querySelectorAll('.fa-solid.fa-star');
+    const ratingType = starsContainer.id.replace('-stars', ''); // Get the type of rating
+    stars.forEach((star, index1) => {
+        star.addEventListener("click", () => {
+            const starsInContainer = document.querySelectorAll(`#${starsContainer.id} .fa-solid.fa-star`);
+            handleStarClick(starsInContainer, index1, ratingType);
+            console.log(ratingType)
+        });
+    });
+});
+
+// Get all forms with class 'update-comment' and add submit event listener to each
+const forms = document.querySelectorAll('form[name="update-comment"]');
+forms.forEach(form => {
+    form.addEventListener('submit', handleSubmit);
+});
+
+
+function deleteOnSubmit(event) {
+    event.preventDefault(); // Prevent default form submission
+  
+    // Get form data
+    const form = event.target;
+    const index = form.dataset.index;
+
+    console.log(index)
+    const reviewId = `review-${index}`;
+    console.log(reviewId)
+   
+    const formData = new FormData(form);
+
+    const data = {
+      deleteId: formData.get('deleteId')
+    };
+
+    console.log(data.deleteId);
+
+    // Send the id to the server using fetch
+    fetch('/delete-comment', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Comment deleted successfully');
+            // Optionally, update UI or perform other actions
+            // For example, remove the deleted comment from the UI
+            const deletedComment = document.getElementById(reviewId);
+            console.log(deletedComment)
+            if (deletedComment) {
+                deletedComment.remove();
+            }
+        } else {
+            console.error('Failed to delete comment');
+            // Handle error
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting comment:', error);
+        // Handle error
+    });
+}
+
+const delforms = document.querySelectorAll('form[name="delCommentForm"]');
+delforms.forEach(form => {
+    form.addEventListener('submit', deleteOnSubmit);
+});
+
+
+document.querySelectorAll('.edit-button').forEach(button => {
+    button.addEventListener('click', (event) => {
+        console.log("Edit button clicked");
+        event.preventDefault();
+
+        $.post('/get-user-info', function(data) {
+            console.log("In Ajax");
+            const loggedInUsername = data.username; // Get the logged-in user's username from the server response
+
+            // Use event target to get the clicked button and its data index
+            const clickedButton = event.target;
+            const dataIndex = clickedButton.getAttribute('data-index');
+            console.log("Index for user", dataIndex);
+            const commenterUsername = document.querySelector(`.review-profile-name-${dataIndex}`).innerText; // Assuming you have an element with the commenter's username and an id like 'commenter-username-0', 'commenter-username-1', etc.
+            console.log("commenter user", commenterUsername);
+            console.log("logged user", loggedInUsername);
+
+            if (commenterUsername === loggedInUsername) {
+                // Proceed with editing
+                openEditModal(dataIndex);
+                console.log("Match Found");
+            } else {
+                // Close all modals
+                document.querySelectorAll('.edit-popup-container').forEach(modal => {
+                    modal.close();
+                });
+                // Alert and reset
+                alert('You are not authorized to edit this comment.');
+            }
+        })
+        .fail(function(error) {
+            console.error('Error fetching user information:', error);
+            console.log("Error");
+        });
+    });
+});
+
+// function openEditModal(dataIndex) {
+//     // Open the modal for editing using the data index
+//     const modal = document.querySelector(`.edit-popup-container[data-modal-id="${dataIndex}"]`);
+//     if (modal) {
+//         modal.showModal();
+//     }
+// }
+
+document.querySelectorAll('.del-button').forEach(button => {
+    button.addEventListener('click', (event) => {
+        console.log("Delete button clicked");
+        event.preventDefault();
+
+        $.post('/get-user-info', function(data) {
+            console.log("In Ajax");
+            const loggedInUsername = data.username; // Get the logged-in user's username from the server response
+
+            // Use event target to get the clicked button and its data index
+            const clickedButton = event.target;
+            const dataIndex = clickedButton.getAttribute('data-index');
+            console.log("Index for user", dataIndex);
+            const commenterUsername = document.querySelector(`.review-profile-name-${dataIndex}`).innerText; // Assuming you have an element with the commenter's username and an id like 'commenter-username-0', 'commenter-username-1', etc.
+            console.log("commenter user", commenterUsername);
+            console.log("logged user", loggedInUsername);
+
+            if (commenterUsername === loggedInUsername) {
+                // Proceed with deletion
+                openDeleteModal(dataIndex);
+                console.log("Match Found");
+            } else {
+                // Close all delete modals
+                document.querySelectorAll('.delete-popup-container').forEach(modal => {
+                    modal.close();
+                });
+                // Alert and reset
+                alert('You are not authorized to delete this comment.');
+            }
+        })
+        .fail(function(error) {
+            console.error('Error fetching user information:', error);
+            console.log("Error");
+        });
+    });
+});
+
+// function openDeleteModal(dataIndex) {
+//     // Open the modal for deletion using the data index
+//     const modal = document.querySelector(`.delete-popup-container[data-modal-id="${dataIndex}"]`);
+//     if (modal) {
+//         modal.showModal();
+//     }
+// }
+
+
+
+
+
+// Object to store the latest ratings for a single set of stars
+let latestRatingsSingle = {};
+
+// Function to handle star click for a single set of stars
+function handleStarClickSingle(stars, index, ratingType) {
+    stars.forEach((star, index2) => {
+        index >= index2 ? star.classList.add("active") : star.classList.remove("active");
+    });
+    
+    // Get the rating value (index + 1 because index is 0-based)
+    const ratingValue = index + 1;
+    
+    // Update the latest rating for the corresponding type
+    latestRatingsSingle[ratingType] = ratingValue;
+  
+    // Log the latest rating
+    console.log(`Latest ${ratingType} Rating:`, ratingValue);
+}
+
+// Initialize listeners for the single set of stars
+document.querySelectorAll('.stars').forEach(starsContainer => {
+    const stars = starsContainer.querySelectorAll('.fa-solid.fa-star');
+    const ratingType = starsContainer.id.split('-')[0]; // Get the type of rating
+    stars.forEach((star, index) => {
+        star.addEventListener("click", () => {
+            handleStarClickSingle(stars, index, ratingType);
+        });
+    });
+});
+
+// Function to send data to the server for creating a comment
+function createDataToServer(formData) {
+    // Example URL where you want to send the data
+    const url = '/create-comment';
+
+    // Fetch API to send data to the server
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Comment created successfully.');
+            // Optionally, clear the form and update the UI
+        } else {
+            console.error('Failed to create comment');
+        }
+    })
+    .catch(error => {
+        // Handle error if the request fails
+        console.error('Error sending data:', error);
+    });
+}
+
+// Function to handle form submission for creating a comment
+function handleCreateCommentSubmit(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Get form data
+    const formData = new FormData(event.target);
+   
+    console.log(formData.get('restonamehere'))
+    // Construct object with title, desc, and ratings
+    const data = {
+        title: formData.get('title'),
+        desc: formData.get('desc'),
+        restoName: formData.get('restonamehere'),
+        foodRating: latestRatingsSingle['food'],
+        serviceRating: latestRatingsSingle['service'],
+        ambianceRating: latestRatingsSingle['ambiance'],
+        overallRating: latestRatingsSingle['overall'],
+        date: new Date().toLocaleDateString()
+
+    };
+
+    console.log("CREATE DATA: ", data)
+
+    // Check if all ratings are provided
+    const requiredRatings = ['food', 'service', 'ambiance', 'overall'];
+    for (const ratingType of requiredRatings) {
+        if (!latestRatingsSingle.hasOwnProperty(ratingType)) {
+            alert(`Please provide a ${ratingType} rating.`);
+            return; // Prevent further execution
+        }
+    }
+
+    // Send data to the server
+    createDataToServer(data);
+
+    // Clear the form and reset ratings
+    // event.target.reset();
+    // latestRatingsSingle = {};
+    // document.querySelectorAll('.stars .fa-solid.fa-star').forEach(star => {
+    //     star.classList.remove("active");
+    // });
+}
+
+// Add event listener to the form
+const createCommentForm = document.querySelector('form[name="create-comment"]');
+createCommentForm.addEventListener('submit', handleCreateCommentSubmit);

@@ -1,26 +1,13 @@
 const express = require("express");
 const { MongoClient } = require("mongodb");
-const uri = "mongodb://127.0.0.1:27017/eggyDB";
-
+const uri = "mongodb://127.0.0.1:27017/test";
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-
-const { User } = require('../models/db.js'); 
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const uploadDir = path.join(__dirname, '..', 'public', 'images');
-// app.use(express.static(path.join(__dirname, 'src', 'public')));
-
-
-
-
-
 
 async function connectToDB() {
   try {
     const client = await MongoClient.connect(uri);
-    return client.db("eggyDB");
+    return client.db('test');
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
     throw error;
@@ -95,11 +82,24 @@ module.exports = function (app, app_data) {
     console.error("Error connecting to MongoDB:", err);
   });
 
-  // Routes
   app.get("/", (req, res) => {
-    console.log(loginInfo);
-    loadServer(req, res, loginInfo);
+
+    const { user } = req.cookies;
+
+    if (user) {
+      // Render the protected content
+      res.redirect('/home');
+    } else {
+        // If the 'user' cookie doesn't exist or user is not authenticated, redirect to the login page
+        loginInfo = null;
+        loadServer(req, res, loginInfo);
+    }
   });
+  app.get("/home", async (req, res) => {
+      const { user } = req.cookies;
+      loginInfo = await userModel.findOne({ username: user }).lean();
+      loadServer(req, res, loginInfo);
+    });
 
   app.post("/update-image", async (req, res) => {
     try {
@@ -236,6 +236,7 @@ module.exports = function (app, app_data) {
         res.status(500).send("Internal Server Error");
     }
   });
+
   // Route to create a new user
   app.post(
     "/create-user",
@@ -252,7 +253,7 @@ module.exports = function (app, app_data) {
         }
 
         const client = await MongoClient.connect(uri);
-        const dbo = client.db("eggyDB");
+        const dbo = client.db('test');
         const collName = dbo.collection("users");
 
         const users = await userModel.find({}, "username email").lean();
@@ -301,350 +302,338 @@ module.exports = function (app, app_data) {
     }
   );
 
-  // Route to login user
   app.post("/read-user", async (req, res) => {
     try {
-      const client = await MongoClient.connect(uri);
-      const dbo = client.db("eggyDB");
-      const collName = dbo.collection("users");
+      const { userlogin, passlogin , remember} = req.body;
 
-      const searchQuery = {
-        username: req.body.userlogin,
-        password: req.body.passlogin,
-      };
+      // Find the user in the database
+      const user = await userModel.findOne({ username: userlogin }).lean();
 
-      let current_hashed_password = "";
+      if (!user) {
+        return res.redirect('/');
+      }
 
-      const username = await userModel
-        .findOne({ username: req.body.userlogin })
-        .lean();
+      bcrypt.compare(passlogin, user.password, (err, isValid) => {
+        if (err) {
+          console.error("Error comparing passwords:", err);
+          return res.status(500).send("Internal Server Error");
+        }
 
-      bcrypt.hash(req.body.passlogin, saltRounds, async function (err, hash) {
-        current_hashed_password = hash;
-
-        const userInfo = await userModel
-          .findOne({
-            username: req.body.userlogin
-          })
-          .lean();
-
-          console.log(userInfo);
-
-        if (userInfo) {
-          loginInfo = {
-            username: req.body.userlogin,
-            password: req.body.passlogin,
+        if (isValid) { // Password is correct
+          // Set the cookie if "Remember Me" is checked
+          const options = {
+            maxAge: remember ? 30 * 24 * 60 * 60 * 1000 : 0, // 30 days or 0 (session cookie)
+            httpOnly: true, // Cookie accessible only by server
           };
-          res.redirect("/");
+          res.cookie('user', userlogin, options);
+
+          // Redirect to the protected route
+          return res.redirect('/home');
         } else {
-          loginInfo = null;
-          res.redirect("/");
+          // Incorrect password, redirect back to login
+          return res.redirect('/');
         }
       });
     } catch (error) {
       console.error("Error reading user:", error);
       res.status(500).send("Internal Server Error");
     }
-  });
+  }); 
 
-  // Route to logout user
+
   app.post("/logout-user", (req, res) => {
     loginInfo = null;
+    res.clearCookie('user');
     loadServer(req, res, null);
   });
 
   const createArray = (N) => {
     return [...Array(N).keys()].map((i) => i + 1);
   };
-  app.get("/userProfile", async (req, res) => {
-    try {
-      const username = loginInfo.username;
-      // Fetch data for comments, users, and restaurants concurrently
-      const [comments, users, restaurants] = await Promise.all([
-        getData("comments", { name: username }), // Filter comments by name
-        getData("users", { username: username }), // Filter users by username
-        getData("restaurants", {}), // Fetch all restaurants
-      ]);
   
-      const createArrays = (comment) => {
-        comment["food-stars"] = createArray(comment["food-rating"]);
-        comment["service-stars"] = createArray(comment["service-rating"]);
-        comment["ambiance-stars"] = createArray(comment["ambiance-rating"]);
-        comment["overall-stars"] = createArray(comment["overall-rating"]);
-      };
-  
-      const createRestaurantArrays = (restaurant) => {
-        restaurant["rating-stars"] = createArray(restaurant["main_rating"]);
-      };
-  
-      comments.forEach(createArrays);
-      restaurants.forEach(createRestaurantArrays);
-      console.log("These are the users");
-      console.log(users);
-      console.log("Data fetched successfully");
-  
-      // Render user profile page with data
-      res.render("user-profile", {
-        layout: "user-layout",
-        title: "User Profile",
-        commentData: comments,
-        userData: [users[0]], // Assuming users variable is defined somewhere
-        restoData: restaurants,
-        loginData: loginInfo
-      });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      res.status(500).send("Error fetching data");
-    }
-  });
-  
-  app.post('/update-comment', function (req, resp) {
-    console.log("RECEIVED", req.body);
-  
-    // Parse the received ratings data
-    const ratingsData = req.body;
-  
-    // Initialize objects to store ratings for each category
-    const foodRatings = {};
-    const serviceRatings = {};
-    const ambianceRatings = {};
-    const overallRatings = {};
-  
-    // Iterate over the keys of ratingsData
-    for (const key in ratingsData) {
-        // Check the category of the rating based on the key prefix
-        if (key.startsWith('food-')) {
-            const id = key.slice(5); // Remove the 'food-' prefix to get the id
-            foodRatings[id] = ratingsData[key];
-        } else if (key.startsWith('service-')) {
-            const id = key.slice(8); // Remove the 'service-' prefix to get the id
-            serviceRatings[id] = ratingsData[key];
-        } else if (key.startsWith('ambiance-')) {
-            const id = key.slice(9); // Remove the 'ambiance-' prefix to get the id
-            ambianceRatings[id] = ratingsData[key];
-        } else if (key.startsWith('overall-')) {
-            const id = key.slice(8); // Remove the 'overall-' prefix to get the id
-            overallRatings[id] = ratingsData[key];
-        }
-    }
-  
-    // Extract document ID, title, and description
-    const { id, title, desc } = req.body;
-  
-    // Update the document in the database
-    commentModel.findByIdAndUpdate(id, {
-        title,
-        content: desc,
-        foodRating: foodRatings[0],
-        serviceRating: serviceRatings[0],
-        ambianceRating: ambianceRatings[0],
-        overallRating: overallRatings[0]
-    }, { new: true })
-    .then(function (updateResult) {
-        if (!updateResult) {
-            console.log("No matching document found." + id);
-            return resp.status(404).send("No matching document found" + id);
-        }
-  
-        console.log("Update successful");
-        // Send the updated comment data as JSON response
-        resp.json(updateResult);
-    })
-    .catch(function (error) {
-        console.error("Error updating comment:", error);
-        resp.status(500).send("Error updating comment");
+app.get("/userProfile", async (req, res) => {
+  try {
+    const username = loginInfo.username;
+    // Fetch data for comments, users, and restaurants concurrently
+    const [comments, users, restaurants] = await Promise.all([
+      getData("comments", { name: username }), // Filter comments by name
+      getData("users", { username: username }), // Filter users by username
+      getData("restaurants", {}), // Fetch all restaurants
+    ]);
+
+    const createArrays = (comment) => {
+      comment["food-stars"] = createArray(comment["food-rating"]);
+      comment["service-stars"] = createArray(comment["service-rating"]);
+      comment["ambiance-stars"] = createArray(comment["ambiance-rating"]);
+      comment["overall-stars"] = createArray(comment["overall-rating"]);
+    };
+
+    const createRestaurantArrays = (restaurant) => {
+      restaurant["rating-stars"] = createArray(restaurant["main_rating"]);
+    };
+
+    comments.forEach(createArrays);
+    restaurants.forEach(createRestaurantArrays);
+    console.log("These are the users");
+    console.log(users);
+    console.log("Data fetched successfully");
+
+    // Render user profile page with data
+    res.render("user-profile", {
+      layout: "user-layout",
+      title: "User Profile",
+      commentData: comments,
+      userData: [users[0]], // Assuming users variable is defined somewhere
+      restoData: restaurants,
+      loginData: loginInfo
     });
-  });
-  
-  app.get("/chimmy", function (req, resp) {
-    // Connect to MongoDB
-    MongoClient.connect(uri)
-      .then((client) => {
-        console.log("Connected to MongoDB");
-        const dbo = client.db("eggyDB"); // Get the database object
-        const collName = dbo.collection("comments"); // Get the collection
-        const cursor = collName.find({}); // Find all documents in the collection
-  
-        const col2ndName = dbo.collection("restaurants");
-        const cursor2nd = col2ndName.find({});
-  
-        Promise.all([cursor.toArray(), cursor2nd.toArray()])
-          .then(function ([comments, restaurants]) {
-            const createArrays = (comment) => {
-              comment["food-stars"] = createArray(comment["food-rating"]);
-              comment["service-stars"] = createArray(comment["service-rating"]);
-              comment["ambiance-stars"] = createArray(
-                comment["ambiance-rating"]
-              );
-              comment["overall-stars"] = createArray(comment["overall-rating"]);
-            };
-            const createRestaurantArrays = (restaurant) => {
-              restaurant["rating-stars"] = createArray(
-                restaurant["main_rating"]
-              );
-            };
-  
-            comments.forEach(createArrays);
-            restaurants.forEach(createRestaurantArrays);
-            console.log(comments[0]);
-            console.log(restaurants);
-            console.log("Length Here");
-            console.log(restaurants.length);
-            console.log("Data fetched successfully");
-  
-            // Split the displayRestos array into two arrays
-            resp.render("estb-review", {
-              layout: "estb-review-layout",
-              title: "Review",
-              commentData: comments,
-              restoData: [restaurants[0]],
-            });
-          })
-          .catch(function (error) {
-            console.error("Error fetching data:", error);
-            resp.status(500).send("Error fetching data");
-          })
-          .finally(() => {
-            client.close(); // Close the MongoDB client after fetching data
-          });
-      })
-      .catch((err) => {
-        console.error("Error connecting to MongoDB:", err);
-        resp.status(500).send("Error connecting to MongoDB");
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).send("Error fetching data");
+  }
+});
+
+
+
+app.post('/update-comment', function (req, resp) {
+  console.log("RECEIVED", req.body);
+
+  // Parse the received ratings data
+  const ratingsData = req.body;
+
+  // Initialize objects to store ratings for each category
+  const foodRatings = {};
+  const serviceRatings = {};
+  const ambianceRatings = {};
+  const overallRatings = {};
+
+  // Iterate over the keys of ratingsData
+  for (const key in ratingsData) {
+      // Check the category of the rating based on the key prefix
+      if (key.startsWith('food-')) {
+          const id = key.slice(5); // Remove the 'food-' prefix to get the id
+          foodRatings[id] = ratingsData[key];
+      } else if (key.startsWith('service-')) {
+          const id = key.slice(8); // Remove the 'service-' prefix to get the id
+          serviceRatings[id] = ratingsData[key];
+      } else if (key.startsWith('ambiance-')) {
+          const id = key.slice(9); // Remove the 'ambiance-' prefix to get the id
+          ambianceRatings[id] = ratingsData[key];
+      } else if (key.startsWith('overall-')) {
+          const id = key.slice(8); // Remove the 'overall-' prefix to get the id
+          overallRatings[id] = ratingsData[key];
+      }
+  }
+
+  // Extract document ID, title, and description
+  const { id, title, desc } = req.body;
+  const currDate = new Date().toLocaleDateString();
+
+  // Update the document in the database
+  commentModel.findById(id).then(function (updateResult) {
+      if (!updateResult) {
+          console.log("No matching document found." + id);
+          return resp.status(404).send("No matching document found" + id);
+      }
+
+      console.log(updateResult);
+      updateResult.title = title;
+      updateResult.content = desc;
+      updateResult['food-rating'] = foodRatings[0];
+      updateResult['service-rating'] = serviceRatings[0];
+      updateResult['ambiance-rating'] = ambianceRatings[0];
+      updateResult['overall-rating'] = overallRatings[0];
+      updateResult.date = currDate;
+      updateResult.isEdited = 1;
+
+      // Save the updated document
+      updateResult.save().then(function (updateSaved) {
+          if (updateSaved) {
+              console.log("Update successful");
+              // Send the updated comment data as JSON response
+              resp.json(updateResult);
+          } else {
+              console.log("Update failed");
+              resp.status(500).send("Update failed");
+          }
+      }).catch(function (error) {
+          console.error("Error saving update:", error);
+          resp.status(500).send("Error saving update");
       });
+  }).catch(function (error) {
+      console.error("Error finding document:", error);
+      resp.status(500).send("Error finding document");
+  });
+});
+
+
+
+app.delete('/delete-comment', function(req, res) {
+  const commentId = req.body.deleteId; // Make sure this matches the name attribute of your form input
+  console.log(commentId);
+
+  commentModel.findByIdAndDelete(commentId)
+      .then(deletedDocument => {
+          if (deletedDocument) {
+              console.log('Comment deleted successfully:', deletedDocument);
+              // Send a success response back to the client
+              res.status(200).json({ message: 'Comment deleted successfully' });
+          } else {
+              console.log('Document not found.');
+              // Send a response indicating that the document was not found
+              res.status(404).json({ message: 'Document not found' });
+          }
+      })
+      .catch(error => {
+          console.error('Error deleting document:', error);
+          // Send a response indicating that an error occurred
+          res.status(500).json({ message: 'Error deleting document', error });
+      });
+});
+
+ 
+
+
+
+
+
+
+
+// Middleware to fetch restaurant and comments data
+async function getRestaurantData(req, res, next) {
+  const client = new MongoClient(uri);
+  try {
+    await client.connect();
+    const dbo = client.db('test');
+
+    const commentsCollection = dbo.collection("comments");
+    const restaurantsCollection = dbo.collection("restaurants");
+
+    // Fetch all comments and restaurants, and store in res.locals
+    res.locals.comments = await commentsCollection.find({}).toArray();
+    res.locals.restaurants = await restaurantsCollection.find({}).toArray();
+
+    // Process comments
+    res.locals.comments.forEach(comment => {
+      comment["food-stars"] = createArray(comment["food-rating"]);
+      comment["service-stars"] = createArray(comment["service-rating"]);
+      comment["ambiance-stars"] = createArray(comment["ambiance-rating"]);
+      comment["overall-stars"] = createArray(comment["overall-rating"]);
+    });
+
+    // Process restaurants
+    res.locals.restaurants.forEach(restaurant => {
+      restaurant["rating-stars"] = createArray(restaurant["main_rating"]);
+    });
+
+    next(); // Proceed to the route handler
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).send("Error fetching data");
+  } finally {
+    await client.close();
+  }
+}
+
+// Route handler for restaurant page
+app.get("/:restaurantLink", getRestaurantData, async (req, resp) => {
+  const restaurantLink = req.params.restaurantLink;
+  const { comments, restaurants } = resp.locals;
+  let commentsForRestaurant = comments;
+
+  // Find the restaurant data based on the restaurant link
+  const restaurantData = restaurants.find(r => r.restoLink === restaurantLink);
+
+  if (restaurantData) {
+      // If search query exists, filter comments based on title or content
+      if (req.query.query) {
+          const queryTC = req.query.query;
+          commentsForRestaurant = commentsForRestaurant.filter(comment =>
+              comment.restoName === restaurantData.restoName &&
+              (comment.title.includes(queryTC) || comment.content.includes(queryTC))
+          );
+      } else {
+          // Otherwise, display all comments for the restaurant
+          commentsForRestaurant = commentsForRestaurant.filter(comment =>
+              comment.restoName === restaurantData.restoName
+          );
+      }
+
+      // Render the page with the restaurant data and filtered comments
+      resp.render("estb-review", {
+          layout: "estb-review-layout",
+          title: restaurantData.restoName,
+          commentData: commentsForRestaurant,
+          restoData: [restaurantData],
+          loginData: loginInfo
+      });
+  } else {
+      // No match was found, handle the error (e.g., render a 404 page)
+      resp.status(404).render("not-found-page");
+  }
+});
+
+app.post('/get-user-info', (req, res) => {
+    console.log("loginInfo", loginInfo.username)
+  res.json({
+      username: loginInfo.username
   });
 
-
-// Check if the directory exists, create it if it doesn't
-// if (!fs.existsSync(uploadDir)){
-//   fs.mkdirSync(uploadDir, { recursive: true });
-// }
-// const storage = multer.diskStorage({
-//   destination: function(req, file, cb) {
-//     cb(null, path.join(__dirname, '..', 'public', 'images')); // Adjust based on actual structure
-//   },
-//   filename: function(req, file, cb) {
-//     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-//   }
-// });
-
-// const upload = multer({
-//   storage: storage,
-//   fileFilter: function(req, file, cb) {
-//     if (file.mimetype.startsWith('image/')) {
-//       cb(null, true);
-//     } else {
-//       cb(new Error('Only images are allowed'));
-//     }
-//   }
-// });
-// const storage = multer.diskStorage({
-//   destination: function(req, file, cb) {
-//     // Use a directory within your project structure
-//     const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
-//     if (!fs.existsSync(uploadsDir)) {
-//       fs.mkdirSync(uploadsDir, { recursive: true });
-//     }
-//     cb(null, uploadsDir);
-//   },
-//   filename: function(req, file, cb) {
-//     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-//   }
-// });
-
-// const upload = multer({ storage });
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    // Construct the path to the public/images directory relative to this script
-    const uploadsDir = path.join(__dirname, '..', '..', 'public', 'images');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-    cb(null, uploadsDir);
-  },
-  filename: function(req, file, cb) {
-    // Generate a unique filename for the uploaded file
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-  }
+  console.log("loginInfo", loginInfo.username)
 });
 
-const upload = multer({ storage });
-
-
-app.post('/update-profile', upload.single('img'), async (req, res) => {
-  const { username: newUsername, email, password, description } = req.body;
-  // const avatarImgPath = req.file ? path.join('/images', req.file.filename) : undefined;
-  // const avatarImgPath = req.file ? `/images/${req.file.filename}` : undefined;
-  // Inside your /update-profile route
-  const avatarImgPath = req.file ? `/images/${req.file.filename}` : undefined;
-
-  const currentUsername = loginInfo.username;
-
+app.post('/create-comment', async (req, res) => {
   try {
-    const user = await User.findOne({ username: currentUsername });
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
+      // Extract data from request body
+      const { title, desc, restoName, foodRating, serviceRating, ambianceRating, overallRating, date } = req.body;
 
-    // Dynamically create an update object
-    let updateData = {};
-    if (newUsername) updateData.username = newUsername;
-    if (email) updateData.email = email;
-    
-    // Only hash the password if it's provided
-    if (password) {
-      // Hash the new password
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
-      updateData.password = hashedPassword;
-    }
-    
-    if (avatarImgPath) updateData.avatar_img = avatarImgPath;
-    if (description) updateData.description = description;
-
-    // Perform the update only if updateData is not empty
-    if (Object.keys(updateData).length > 0) {
-      const updatedUser = await User.findByIdAndUpdate(user._id, updateData, { new: true });
-      if (updatedUser) {
-        // Optionally update loginInfo if the username changes
-        if (newUsername) loginInfo.username = newUsername;
-        res.json({ success: true, message: 'Profile updated successfully', user: updatedUser });
-      } else {
-        res.status(404).json({ success: false, message: 'Update failed' });
-      }
-    } else {
-      res.json({ success: false, message: 'No update information provided' });
-    }
-  } catch (error) {
-    console.error('Error updating user profile:', error);
-    res.status(500).json({ success: false, message: 'Error updating profile' });
-  }
-});
-
-app.post('/delete-account', async (req, res) => {
-  if (!loginInfo) {
-    // This condition checks if there's a user logged in
-    return res.status(403).json({ success: false, message: "No user logged in." });
-  }
-  
-  const currentUsername = loginInfo.username; // Get the username of the logged-in user
-  
-  try {
-      const result = await User.deleteOne({ username: currentUsername });
-      if (result.deletedCount === 0) {
-          return res.json({ success: false, message: "Failed to delete account." });
+      console.log(loginInfo.username)
+      console.log("Food Rating:", foodRating);
+      console.log("Service Rating:", serviceRating);
+      console.log("Ambiance Rating:", ambianceRating);
+      console.log("Overall Rating:", overallRating);
+      // Find the user in the database
+      const user = await userModel.findOne({ username: loginInfo.username });
+      console.log(user)
+      // Check if the user was found
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
       }
 
-      // Clear the loginInfo as the account has been successfully deleted
-      loginInfo = null;
 
-      // Since this route handles AJAX requests, we can't directly use res.redirect here
-      // Instead, we send a response indicating success and handle the redirection on the client side
-      res.json({ success: true, message: "Account deleted successfully.", redirectTo: '/' });
+      console.log("RestoName", restoName)
+      // Create a new comment document
+      const newComment = new commentModel({
+          name: user.username,
+          'user-img': user.avatar_img, // Include the avatar image from the user document
+          title: title,
+          restoName: restoName,
+          content: desc,
+          'food-rating': foodRating,
+          'service-rating': serviceRating,
+          'ambiance-rating': ambianceRating,
+          'overall-rating': overallRating,
+          date: date
+      });
+
+      // Save the new comment to the database
+      await newComment.save();
+      console.log('Comment saved properly:', newComment);
+
+      // Send a success response
+      res.status(201).json({ message: 'Comment created successfully', comment: newComment });
   } catch (error) {
-      console.error('Error deleting user account:', error);
-      res.status(500).json({ success: false, message: 'Error deleting account' });
+      // Handle any errors that occur during the process
+      console.error('Error creating comment:', error);
+      res.status(500).json({ message: 'Error creating comment', error: error.message });
   }
 });
+
+
+function errorFn(err){
+  console.log('Error fond. Please trace!');
+  console.error(err);
+}
 
 
 

@@ -7,18 +7,17 @@
 // npm i install bcrypt 
 // npm i install multer
 // npm i express express-handlebars body-parser multer
+// npm i cookie-parser
 
 /*Imports */
 const express = require("express");
+const cookieParser = require('cookie-parser');
 const path = require("path");
 const bodyParser = require("body-parser");
 const exphbs = require("express-handlebars");
 const fs = require("fs");
 const app = express();
-const PORT = 1122;
-
-
-
+const PORT = 4000;
 
 
 const rawData = fs.readFileSync("src/models/Restaurant.json");
@@ -33,7 +32,7 @@ const feedbacks = JSON.parse(rawData3);
 const rawData4 = fs.readFileSync("src/models/comment.json");
 const rawComments = JSON.parse(rawData4);
 
-const uri = "mongodb://127.0.0.1:27017/eggyDB";
+const uri = "mongodb://127.0.0.1:27017/test";
 
 const hbs = exphbs.create({
   extname: ".hbs",
@@ -48,10 +47,13 @@ app.set("views", path.join(__dirname, "src", "views")); // views directory path
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// Assuming 'public' is already served as static, and 'uploads' is a subdirectory
-
-app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(cookieParser());
+// app.use(session({
+//   secret: 'secret lang',
+//   cookie: { maxAge: 30000 },
+//   saveUninitialized: false,
+//   store
+// }));
 
 const mongoose = require("mongoose");
 

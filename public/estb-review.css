@@ -89,18 +89,18 @@
   margin-left: 5px;
   border-radius: 50%;
 }
-.search {
+/* .search {
   display: flex;
   margin-left: 5px;
   margin-top: 1%;
-}
+} */
 
 #home-icon,
 #explore-icon {
   font-size: 50px;
   color: #fff;
   margin-top: 15px;
-  padding-right: 30px; /* Adjust margin as needed */
+  padding-right: 0px; /* Adjust margin as needed */
 }
 #home-icon:hover,
 #explore-icon:hover {
@@ -199,26 +199,29 @@
 
 /* Adjust other styles as needed */
 
-.search input {
+/* .search input {
   height: 40px;
   width: 100%;
   padding-right: 300px;
   margin-top: -1%;
   border-radius: 100px;
   padding-left: 20px;
-}
+} */
 
 
-.search-form {
+.search-form, 
+.search-form-comments{
   display: flex;
 }
 
-.search-input::placeholder {
+.search-input::placeholder,
+.search-input-comments::placeholder{
   font-family: "Inter";
   font-size: 36px;
 }
 
-.search-form button {
+.search-form button,
+.search-form-comments button{
   margin-left: 3px;
   margin-right: -70px;
   margin-top: -2%;
@@ -233,7 +236,8 @@
   border: none;
 }
 
-.search-form button:hover {
+.search-form button:hover,
+.search-form-comments button:hover {
   color: #ff5300;
 }
 
@@ -286,7 +290,7 @@ hr {
   margin-bottom: 1%;
 }
 .establishment {
-  margin-left: 75px;
+  margin-left: 3%;
   margin-right: 120px;
   border: solid;
   border-radius: 10px;
@@ -294,17 +298,22 @@ hr {
   border-width: 1px;
   display: flex;
   margin-top: 8.5%;
+
 }
 .establishment-left {
   margin-left: 2%;
   margin-top: 2%;
 
-  margin-bottom: 2%;
-  width: 1400px;
+  width: 750px;
 }
 
 .establishment-profile {
   display: flex;
+  width: 100%;
+}
+
+.establishment-right{
+  padding-right: 5%;
 }
 
 .chimmy-photo {
@@ -314,14 +323,18 @@ hr {
 }
 .establishment-profile-text {
   margin-left: 20px;
+  padding-right: 100px;
+  width: 400px;
 }
 .establishment-name {
   margin-top: 1px;
   font-family: "Dhyana";
-  font-size: 24px;
+  width: 300px;
+  font-size: 16px;
+
 }
 .establishment-username {
-  margin-top: -25px;
+  margin-top: -20px;
   font-family: "Dhyana";
   color: #8e8888;
   font-size: 16px;
@@ -333,8 +346,8 @@ hr {
 .diamond-photo {
   width: 20px;
   height: 16px;
-  margin-top: 15px;
-  margin-left: 15px;
+  margin-top: 9px;
+  margin-left: px;
 }
 
 .rating-font {
@@ -344,8 +357,8 @@ hr {
 
 .establishment-top-right {
   font-family: "DM Sans";
-  margin-left: 1200px;
-  font-size: 24px;
+  margin-left: 500px;
+  font-size: 16px;
   color: #ffa800;
   margin-top: -80px;
 }
@@ -356,16 +369,16 @@ hr {
 
 .resto-name {
   font-family: "Outfit";
-  font-size: 45px;
-  padding-top: 40px;
-  margin-top: 15px;
+  font-size: 37px;
+
+  margin-top: 90px;
   margin-bottom: 15px;
 }
 .establishment-desc {
   font-family: "Outfit";
   text-align: justify;
   font-weight: 300;
-  font-size: 22px;
+  font-size: 14px;
 }
 
 .estabslishment-right {
@@ -375,15 +388,15 @@ hr {
 }
 
 .slider {
-  width: 640px;
-  height: 400px;
+  width: 575px;
+  height: 323px;
   border-radius: 10px;
   overflow: hidden;
 }
 
 .slides {
   width: 500%;
-  height: 500px;
+  height: 323px;
   display: flex;
 }
 
@@ -397,16 +410,16 @@ hr {
 }
 
 .slide img {
-  width: 640px;
-  height: 400px;
+  width: 575px;
+  height: 323px;
 }
 
 /*css for manual slide navigation*/
 
 .navigation-manual {
   position: absolute;
-  width: 640px;
-  margin-top: -150px;
+  width: 575px;
+  margin-top: -48px;
   display: flex;
   justify-content: center;
 }
@@ -448,9 +461,9 @@ hr {
 .navigation-auto {
   position: absolute;
   display: flex;
-  width: 640px;
+  width: 575px;
   justify-content: center;
-  margin-top: 350px;
+  margin-top: 275px;
 }
 
 .navigation-auto div {
@@ -511,7 +524,7 @@ hr {
   display: flex;
   margin-left: 3%;
   margin-right: 5%;
-  margin-top: 2%;
+  margin-top: -10 px;
   width: 92.5%;
   border-bottom: solid;
 }
@@ -585,7 +598,7 @@ hr {
 .review-left {
   margin-left: 2%;
   margin-top: 2%;
-  width: 70%;
+  width: 63%;
 }
 
 .review-left-top-profile {
@@ -601,39 +614,38 @@ hr {
 .review-left-top-profile-text {
   margin-left: 2%;
   width: 600px;
-}
-.review-profile-name {
-  margin-top: 1px;
+  margin-top: 20px;
   font-family: "Dhyana", sans-serif;
-  font-size: 24px;
+  font-size: 42px;
   font-weight: bold;
 }
-.review-username {
-  font-family: "Dhyana";
-  color: #8e8888;
-  font-size: 16px;
-  font-weight: lighter;
+.review-profile-name {
+  margin-top: 20px;
+  font-family: "Dhyana", sans-serif;
+  font-size: 42px;
+  font-weight: bold;
 }
 
 .settings {
-  width: 40%;
+  width: 100%;
   font-family: "Inter";
   font-size: 18px;
   color: #8e8888;
-  margin-left: 1000px;
+  margin-left: 800px;
+  margin-top: -60px;
 }
 .settings-photo {
   width: 55px;
   margin-left: 0px;
 }
 .review-title {
-  font-size: 32px;
+  font-size: 24px;
   font-family: "outfit";
   font-weight: bold;
   margin-left: 7.5%;
 }
 .review-desc {
-  font-size: 22px;
+  font-size: 14px;
   font-family: "outfit";
   font-weight: 300;
   margin-left: 7.5%;
@@ -652,7 +664,7 @@ hr {
 .rating-1,
 .rating-2 {
   font-family: "DM Sans";
-  font-size: 30px;
+  font-size: 22px;
   display: flex;
 }
 
@@ -665,7 +677,7 @@ hr {
 }
 
 .stars-1 {
-  width: 35px;
+  width: 25px;
   margin-top: 5px;
 }
 .stars-rating {
@@ -761,7 +773,7 @@ hr {
   padding-right: 40px;
 }
 
-.search {
+/* .search {
   margin-left: 1400px;
   margin-top: 1%;
   margin-bottom: 25px;
@@ -772,7 +784,7 @@ hr {
   width: 200px;
   border-radius: 50px;
   padding-left: 20px;
-}
+} */
 
 .search-form {
   display: flex;
@@ -949,10 +961,12 @@ hr {
   outline: none;
   background-color: white;
   cursor: pointer;
+
 }
 
 .dropdown {
   display: inline-block;
+  
 }
 .dropdown button {
   background-color: white;
@@ -966,12 +980,13 @@ hr {
   display: none;
   position: absolute;
   background-color: white;
-  min-width: 100px;
+  min-width: 70px;
   box-shadow: 2px 2px 5px hsla(0, 0%, 0%, 0.8);
-  margin-left: 100px;
+
 }
 .dropdown:hover .content {
   display: block;
+
 }
 
 .edit-button,
@@ -979,7 +994,7 @@ hr {
   border: none;
   outline: none;
   cursor: pointer;
-  font-size: 26px;
+  font-size: 15px;
   font-family: "Inter";
   font-weight: bold;
 }
@@ -989,7 +1004,7 @@ hr {
   border: none;
   outline: none;
   cursor: pointer;
-  font-size: 26px;
+  font-size: 15px;
   font-family: "Inter";
   font-weight: bold;
 }
@@ -1153,7 +1168,6 @@ AKLSDJAKLDAJKDAJALKDJ .edit-popup-profile-photo {
 .settings-button {
   border: none;
   outline: none;
-  margin-left: 100px;
 }
 
 .dropdown-1 button {
@@ -1178,9 +1192,8 @@ AKLSDJAKLDAJKDAJALKDJ .edit-popup-profile-photo {
   display: none;
   position: absolute;
   background-color: lightgrey;
-  min-width: 100px;
+  min-width: 70px;
   box-shadow: 2px 2px 5px hsla(0, 0%, 0%, 0.8);
-  margin-left: 100px;
 }
 
 .dropdown-1:hover .content {
@@ -1454,136 +1467,489 @@ input::placeholder{
   opacity: 0.7;
 }
 
-.popup-login {
-  background: rgba(0, 0, 0, 0.5);
-  width: 100%;
-  height: 1540px;
-  position: absolute;
-  top: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
 
-.popup-login-content {
-  height: 300px;
-  width: 500px;
-  background-color: #fff;
-  border-radius: 10px;
 
-  box-sizing: border-box; /* to prevent padding from making the div bigger*/
-  padding: 50px;
 
-  border: 2px solid #ffa800;
+  /* HEADER
 
-  position: relative;
-}
 
-.popup-login-content > img {
-  height: 50px;
-  width: 100px;
-}
+  
+  /* Adjust other styles as needed */
+/*   
+  .search {
+    margin-left: 680px;
+    margin-top: 1%;
+  } */
+  
+  /* .search input {
+    height: 20px;
+    width: 100px;
+    margin-top: -1%;
+    border-radius: 50px;
+  } */
+  
+  .search-form {
+    display: flex;
+  }
+  
+  .search-input::placeholder {
+    font-family: "Inter";
+    font-size: 22px;
+  }
+  
+  .search-form button {
+    margin-left: 3px;
+    margin-top: -2%;
+    padding: 10px;
+    padding-left: 10px;
+    background-color: #ffa800;
+    color: #fff;
+    font-size: 30px;
+    border-left: none;
+    cursor: pointer;
+    border-radius: 50px;
+    border: none;
+  }
+  
+  .search-form button:hover {
+    color: #ff5300;
+  }
 
-.popup-login-content > input {
-  width: 200px;
-  height: 20px;
-  border-radius: 5px;
-  border-width: 1px;
+  .whole {
+    background-image: url();
+    display: flex;
+  }
 
-  margin: 20px auto;
-  display: block;
+  #home-icon {
+    font-size: 30px;
+    color: #fff;
+    margin-top: 5px;
+    margin-right: 20px; /* Adjust margin as needed */
+  }
+  #home-icon:hover {
+    color: #ff5300; /* Change color on hover */
+  }
 
-  box-sizing: border-box; /* to prevent padding from making the div bigger*/
-  padding-left: 5px;
-}
+  .eggy-form {
+    width: 11%;
+    padding-left: 20px;
+  }
 
-.popup-login-content > h1 {
-  font-family: Arial, Helvetica, sans-serif;
-  color: white;
-  position: absolute;
-  top: -65px;
-  right: -40px;
+  #home-icon,
+  #explore-icon {
+    font-size: 30px;
+    color: #fff;
+    margin-top: 5px;
+    margin-right: 20px; /* Adjust margin as needed */
+  }
+  #home-icon:hover,
+  #explore-icon:hover {
+    color: #ff5300; /* Change color on hover */
+  }
 
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: #ffa800;
+  .eggy-form {
+    width: 11%;
+    padding-left: 20px;
+  }
+  
+  #eggy-logo {
+    width: 11%;
+    padding-left: 20px;
+  }
 
-  cursor: pointer;
-}
+  .sort-options {
+    left: 0; /* Fix the position to the left */
+    width: 250px; /* Set a fixed width */
+    margin-top: 9%;
+    padding-left: 1%;
+    border: 2px solid #0c382b;
+    margin-left: 2%;
+    height: 50vh;
+    font-family: "Outfit";
+  }
+  
+  .checked {
+    color: orange;
+  }
+  .stars-rating {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    margin-bottom: 5%;
+    margin-left: 8%;
+  }
+  #apply-button {
+    margin-top: 5%;
+    width: 90%;
+    padding: 2%;
+    background-color: #ffa800;
+    border-radius: 50px;
+    font-family: "Outfit";
+    font-size: 20px;
+  }
+  #apply-button:hover {
+    background-color: #ff5300;
+    color: #fff;
+  }
+  /* Custom styles for the checkbox */
+  .custom-checkbox {
+    appearance: none; /* Remove default appearance */
+    width: 20px; /* Make the checkbox bigger */
+    height: 20px;
+    margin-right: 5%;
+    border-radius: 5px; /* Round the corners */
+    background-color: gray;
+    border: black;
+    cursor: pointer; /* Show pointer cursor on hover */
+  }
+  
+  /* Style for the checked state */
+  .custom-checkbox:checked {
+    background-color: #ffa800; /* Change background color when checked */
+  }
+  
+  .top-header {
+    display: flex;
+    margin: 0;
+    position: fixed;
+    top: 0;
+    left: 0; /* Ensure it's pinned to the left */
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #ffa800; /* Example background color */
+    color: #fff; /* Example text color */
+    padding: 8px; /* Adjust padding */
+    z-index: 1000; /* Ensure it's above other content */
+  }
+  .top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .top-profile {
+    order: 1; /* Move "Home" to the left */
+    display: flex;
+    position: relative;
+    cursor: pointer;
+    background-color: #fff;
+    border: none; /* Remove border */
+    color: #fff;
+    align-items: center;
+    align-content: center;
+    border-radius: 50%;
+    width: 50px; /* Adjust width to whatever you need */
+    height: 50px; /* Adjust height to match width for a perfect circle */
+    margin-right: 3%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  #go-profile {
+    display: block;
+    width: 100%;
+    background-color: #ffa800;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px;
+    margin-top: 5px;
+    cursor: pointer;
+  }
+  
+  #profile-pic {
+    width: 80%;
+    margin-left: 5px;
+    border-radius: 50%;
+  }
+  .search {
+    display: flex;
+    margin-left: 995px;
+    margin-top: 1%;
+  }
+  
+  /* Adjust other styles as needed */
+  
+  .search input {
+    height: 40px;
+    width: 300px;
+    margin-top: -1%;
+    border-radius: 50px;
+    padding: 0;
+    padding-left: 20px;
+  }
+  
+  .search-form {
+    display: flex;
+  }
+  
+  .search-input::placeholder {
+    font-family: "Inter";
+    font-size: 22px;
+  }
+  
+  .search-form button {
+    margin-left: 3px;
+    margin-top: -2%;
+    padding: 10px;
+    padding-left: 10px;
+    background-color: #ffa800;
+    color: #fff;
+    font-size: 30px;
+    border-left: none;
+    cursor: pointer;
+    border-radius: 50px;
+    border: none;
+  }
+  
+  .search-form button:hover {
+    color: #ff5300;
+  }
+  
+  #establishment-title {
+    align-items: center;
+    align-content: center;
+    margin-left: 6%;
+    margin-top: 11%;
+    font-size: 30px;
+    margin-bottom: 0;
+    font-family: "Outfit";
+  }
+  
+  .top-header {
+    display: flex;
+    margin: 0;
+    position: fixed;
+    top: 0;
+    left: 0; /* Ensure it's pinned to the left */
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #ffa800; /* Example background color */
+    color: #fff; /* Example text color */
+    padding: 8px; /* Adjust padding */
+    z-index: 1000; /* Ensure it's above other content */
+  }
+  
+  .top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .opt-titles {
+    margin-right: 20px;
+  }
+  
+  .opt-titles-curr {
+    margin-right: 20px;
+    text-decoration: underline; /* Add underline when hovered */
+    text-decoration-color: white;
+    text-decoration-thickness: 5px;
+  }
+  
+  .top-profile {
+    order: 1; /* Move "Home" to the left */
+    display: flex;
+    position: relative;
+    cursor: pointer;
+    background-color: #fff;
+    border: none; /* Remove border */
+    color: #fff;
+    align-items: center;
+    align-content: center;
+    border-radius: 50%;
+    width: 70px; /* Adjust width to whatever you need */
+    height: 70px; /* Adjust height to match width for a perfect circle */
+    margin-left: 25px;
+    margin-right: 5%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .top-profile:hover .options {
+    visibility: visible;
+  }
+  
+  #eggy-logo {
+    width: 11%;
+    padding-left: 20px;
+  }
+  
+  #profile-pic {
+    width: 80%;
+    margin-left: 7px;
+    border-radius: 50%;
+  }
+  
+  .options {
+    visibility: hidden;
+    position: absolute;
+    top: calc(100%);
+    left: -50%; /* Position options on the left side */
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    width: 200%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .go-profile {
+    display: block;
+    width: 100%;
+    background-color: #ffa800;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px;
+    margin-top: 5px;
+    cursor: pointer;
+  }
+  
+  .go-profile:hover,
+  #login:hover {
+    background-color: #ff5300;
+  }
+  
+  #login {
+    display: block;
+    width: 100%;
+    background-color: #fff;
+    color: black;
+    border: 2px solid #ffa800; /* Added solid border */
+    border-radius: 50px;
+    padding: 10px;
+    margin-top: 5px;
+    cursor: pointer;
+  }
+  
+  #profile-pic {
+    width: 80%;
+    margin-left: 7px;
+    border-radius: 50%;
+  }
+  
+  .header-options a {
+    z-index: 2;
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .header-options :hover {
+    text-decoration: underline; /* Add underline when hovered */
+    text-decoration-color: #fff;
+    text-decoration-thickness: 5px;
+    transition: all 0.3s ease;
+  }
+  
+  footer {
+    background-color: #ffa800;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto; 
+    padding: 0; 
+  
+    height: 80px;
+  }
+  
+  footer > h1 {
+    color: white;
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  
+  .right-container {
+    margin-left: auto;
+  
+    width: 30%;
+    height: 100px;
+  
+    display: flex;
+    align-items: center;
+  }
+  
+  .right-container > button {
+    border-color: black;
+    border-width: 1px;
+    border-radius: 20px;
+    border-style: solid;
+    padding: 2% 8%;
+    background-color: white;
+    text-align: center;
+    color: black;
+    margin-right: 0px;
+  }
+  
+  #signup:hover {
+    background-color: #ff5300;
+    color: white;
+    border-color: #ff5300;
+  }
+  
+  #log-in:hover {
+    background-color: #ff5300;
+    color: white;
+    border-color: #ff5300;
+  }
+  
+  #avatar-logo:hover {
+    transform: scale(1.3);
+  }
+  
+  .right-container > img {
+    border-radius: 50%;
+  
+    height: 40px;
+    width: 40px;
+  
+    border-style: solid;
+    border-width: 1px;
+  }
+  
+  .logo-container {
+    box-shadow: 2px 3px 4px 1px rgba(0, 0, 0, 0.4);
+    background-color: white;
+  
+    border-radius: 45px;
+  
+    height: 90px;
+    width: 200px;
+  
+    margin-left: 5%;
+    margin-top: 55px;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .logo-container > img {
+    border-width: 1px;
+    height: 75px;
+    width: 160px;
+  }
+    .top-display {
+      display: flex;
+    }
+    hr {
+      height: 2px; /* Adjust the height as needed */
+      background-color: #e6e6e6; /* Change the color if desired */
+      border: none; /* Remove default border */
+      margin-top: 3%;
+      
+      width: 104%;
+    }
+  
+    /* END HEADER */
 
-.login-button {
-  font-family: Arial, Helvetica, sans-serif;
-  border-color: black;
-  border-width: 1px;
-  border-radius: 20px;
-  border-style: solid;
-  padding: 5px 10px;
-  background-color: white;
-  text-align: center;
-  color: black;
-  font-size: 15px;
-  margin-left: 10px;
-}
+      .bottom-top-right-edited{
+    color: gray;
+    font-size: 12px;
 
-.login-button:hover {
-  background-color: #ffa800;
-  color: white;
-  border-color: #ffa800;
-}
 
-.popup-signup {
-  background: rgba(0, 0, 0, 0.5);
-  width: 100%;
-  height: 1540px;
-  position: absolute;
-  top: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
+  }
+  .bottom-top-right-date{
+    font-size: 17px;
 
-.popup-signup-content {
-  height: 300px;
-  width: 500px;
-  background-color: #fff;
-  border-radius: 10px;
-
-  box-sizing: border-box; /* to prevent padding from making the div bigger*/
-  padding: 15px;
-
-  border: 2px solid #ffa800;
-
-  position: relative;
-}
-
-.popup-signup-content > img {
-  height: 50px;
-  width: 100px;
-}
-
-.popup-signup-content > input {
-  width: 200px;
-  height: 20px;
-  border-radius: 5px;
-  border-width: 1px;
-
-  margin: 20px auto;
-  display: block;
-
-  box-sizing: border-box; /* to prevent padding from making the div bigger*/
-  padding-left: 5px;
-}
-
-.popup-signup-content > h1 {
-  font-family: Arial, Helvetica, sans-serif;
-  color: white;
-  position: absolute;
-  top: -65px;
-  right: -40px;
-
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: #ffa800;
-
-  cursor: pointer;
-}
+  
+  }
